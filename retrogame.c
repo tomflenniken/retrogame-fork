@@ -1134,6 +1134,9 @@ int main(int argc, char *argv[]) {
 	            keyEv.code  = key[i];
 	            keyEv.value = ((intstate[a] & b) > 0);
 	            write(keyfd, &keyEv, sizeof(keyEv));
+		        write(keyfd, &synEv, sizeof(synEv));
+	            keyEv.code  = 11;
+	            write(keyfd, &keyEv, sizeof(keyEv));
 	            c = 1; // Follow w/SYN event
 	            if(intstate[a] & b) { // Press?
 	              // Note pressed key and set initial repeat interval.
@@ -1193,18 +1196,20 @@ int main(int argc, char *argv[]) {
 	    }
 	    timeout = -1; // Return to normal processing
 	    c       = 0;  // No add'l SYN required
-	  } else if(lastKey >= 0) { // Else key repeat timeout
-	    if(timeout == repTime1) timeout = repTime2;
-	    else if(timeout > 30)   timeout -= 5; // Accelerate
-	    c           = 1; // Follow w/SYN event
-	    keyEv.code  = key[lastKey];
-	    keyEv.value = 2; // Key repeat event
-	    if(debug >= 3) {
-	      printf("%s: repeating key code %d\n",
-	        __progname, keyEv.code);
-	    }
-	    write(keyfd, &keyEv, sizeof(keyEv));
 	  }
+// There are no cases where repeat is necessary; in fact it is undesirable when changing volume
+//	  else if(lastKey >= 0) { // Else key repeat timeout
+//	    if(timeout == repTime1) timeout = repTime2;
+//	    else if(timeout > 30)   timeout -= 5; // Accelerate
+//	    c           = 1; // Follow w/SYN event
+//	    keyEv.code  = key[lastKey];
+//	    keyEv.value = 2; // Key repeat event
+//	    if(debug >= 3) {
+//	      printf("%s: repeating key code %d\n",
+//	        __progname, keyEv.code);
+//	    }
+//	    write(keyfd, &keyEv, sizeof(keyEv));
+//	  }
 	  if(c) write(keyfd, &synEv, sizeof(synEv));
 	}
 
